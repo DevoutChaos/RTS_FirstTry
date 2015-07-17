@@ -3,94 +3,50 @@ using System.Collections;
 
 public class HexInfo : MonoBehaviour
 {
-	//Declarations
+	#region declarations
+	private Vector3 gridPosition;//cube cordinates stored(x,y == axial)
+	public Vector3 localPosition;
+	public Vector3 worldPosition;
+
+	public Vector2 hexExt;
+	public Vector3 hexCenter;
+
+	public HexChunk parentChunk;
+
+	public Mesh localMesh;
+
+	//Basic hexagon mesh making
 	public Vector3[] vertices;
 	public Vector2[] uv;
 	public int[] triangles;
-	
-	public Texture texture;
-	
+
+	//Get axial grid position
+	public Vector2 AxialGridPosition {
+		get { return new Vector2 (CubeGridPosition.x, CubeGridPosition.y); }
+	}
+
+	//Get/Set cube grid position
+	public Vector3 CubeGridPosition {
+		get { return gridPosition; }
+		set { gridPosition = value; }
+	}
+
+	#endregion
+
 	// Use this for initialization
-	void Start ()
+	public void Start ()
 	{
 		MeshSetup ();
 	}
 	
-	// Update is called once per frame
-	void Update ()
-	{
-		
-	}
-	
 	void MeshSetup ()
 	{
-		#region verts
-		
-		float floorLevel = 0;
-		vertices = new Vector3[]
-		{
-			new Vector3 (-1f, floorLevel, -.5f),
-			new Vector3 (-1f, floorLevel, .5f),
-			new Vector3 (0f, floorLevel, 1f),
-			new Vector3 (1f, floorLevel, .5f),
-			new Vector3 (1f, floorLevel, -.5f),
-			new Vector3 (0f, floorLevel, -1f)
-		};
-		
-		#endregion
-		
-		#region triangles
-		
-		triangles = new int[]
-		{
-			1,5,0,
-			1,4,5,
-			1,2,4,
-			2,3,4
-		};
-		
-		#endregion
-		
-		#region uv
-		
-		uv = new Vector2[]
-		{
-			new Vector2 (0, 0.25f),
-			new Vector2 (0, 0.75f),
-			new Vector2 (0.5f, 1),
-			new Vector2 (1, 0.75f),
-			new Vector2 (1, 0.25f),
-			new Vector2 (0.5f, 0)
-		};
-		
-		#endregion
-		
-		#region finalise
-		
-		//add a mesh filter to the GameObject the script is attached to, cache it for later
-		MeshFilter meshFilter = gameObject.AddComponent<MeshFilter> ();
-		//add a mesh renderer to the GameObject the script is attached to
-		gameObject.AddComponent<MeshRenderer> ();
-		
-		//create a mesh object to pass our data into
-		Mesh mesh = new Mesh ();
-		
-		//add our vertices to the mesh
-		mesh.vertices = vertices;
-		//add ou triangles to the mesh
-		mesh.triangles = triangles;
-		//add our UV coordinates to the mesh
-		mesh.uv = uv;
-		
-		//make it play nicely with lighting
-		mesh.RecalculateNormals ();
-		
-		//set the GameObject's meshFilter's mesh to be the one we just made
-		meshFilter.mesh = mesh;
-		
-		//UV TESTING
-		renderer.material.mainTexture = texture;
-		
-		#endregion
+		localMesh = new Mesh ();
+
+		localMesh.vertices = parentChunk.worldManager.flatHexagonSharedMesh.vertices;
+		localMesh.triangles = parentChunk.worldManager.flatHexagonSharedMesh.triangles;
+		localMesh.uv = parentChunk.worldManager.flatHexagonSharedMesh.uv;
+
+		localMesh.RecalculateNormals ();
 	}
 }
